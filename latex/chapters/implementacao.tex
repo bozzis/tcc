@@ -1,12 +1,12 @@
 \chapter{Implementação}
 \label{c.implementacao}
-A implementação foi feita através de um script em Matlab elaborado pelo autor. O script recebe como \emph{input} os dados históricos de todos os dias de um intervalo de anos para uma cidade, e então gera os resultados como \emph{\emph{output}}. A base de dados, inputs, outputs e o script serão tratados com detalhes nos tópicos a seguir.
+A implementação foi feita através de um script em MATLAB elaborado pelo autor. O script recebe como \emph{input} os dados históricos de todos os dias de um intervalo de anos para uma cidade, e então gera os resultados como \emph{output}. A base de dados históricos, os \emph{inputs}, os \emph{outputs} e o script serão tratados com detalhes nos tópicos a seguir.
 
 \section{Base de Dados}
 \label{s.basedados}
-Para a base de dados, a cidade escolhida foi Bauru, no estado de São Paulo. Bauru tem maiores quantidades de chuva durante o verão, com um inverno mais seco.
+Para a base de dados, a cidade escolhida foi Bauru, no estado de São Paulo. Bauru tem maior quantidade de chuva durante o verão, e geralmente tem invernos mais secos.
 
-Todos os dados obtidos estão disponíveis livre e gratuitamente para consulta no site do Instituto Nacional de Meteorologia (INMET) ~\cite{inmet}. A estacão que mediu os dados tem o código de A705, com local em latitude -22,358052, longitude -49,028877 e altitude de 636,17m. Os dados foram medidos dia a dia, durante todos os meses dos anos de 2002 a 2020, sendo no total 19 anos (6935 dias) de dados. Os dias 29 de fevereiro de cada ano foram desconsiderados por não ter uma quantidade suficiente de dados. 
+Todos os dados obtidos estão disponíveis livre e gratuitamente para consulta no site do INMET \cite{inmet}. A estação que mediu os dados tem o código de A705, com local em latitude -22,358052, longitude -49,028877 e altitude de 636,17m. Os dados foram medidos dia a dia, durante todos os meses dos anos de 2002 a 2020, sendo no total 19 anos (6935 dias) de dados. Os dias 29 de fevereiro de cada ano foram desconsiderados por não ter uma quantidade suficiente de dados. 
 
 Os dados disponibilizados são horários, diários ou mensais, de estacões convencionais ou automáticas. Além de dados sobre precipitação, também podem ser consultados dados de temperatura, umidade, vento e pressão atmosférica. As unidades dos dados são:
 \begin{itemize}
@@ -17,24 +17,21 @@ Os dados disponibilizados são horários, diários ou mensais, de estacões conv
     \item Pressão atmosférica média (atm).
 \end{itemize}
 
-
-%é
-
 \section{Inputs e Outputs}
 \label{s.io}
 Para que o script possa funcionar, ele precisa de alguns dados de entrada, chamados de \emph{inputs}. Através desses dados é realizado todo o processamento para então gerar os dados de saída, chamados de \emph{outputs}.
-Esses dados devem estar em formatos específicos para atender as necessidades do programa. Caso contrario, o script não funcionará corretamente e acabará em erros.
+Esses dados devem estar em formatos específicos para atender as necessidades do programa. Caso contrário, o script não funcionará corretamente e acabará em erros.
 
 \subsection{Inputs}
 \label{ss.inputs}
-Para os dados de entrada, chamados de \emph{inputs}, o script precisa de 12 arquivos em formato .txt que funcionam como matrizes, cada um representando cada mês, de janeiro a dezembro. Cada um desses arquivos deve ter 31 linhas, representando os dias, e no mínimo 2 colunas, representando a base histórica dos anos. Além desses 12 arquivos, um arquivo extra é necessário com a precipitação diária do dia anterior ao dia mais antigo da base de dados, pois a Cadeia de Markov a qual o modelo se baseia utiliza dados dos dias anteriores para gerar as probabilidades condicionais necessárias. Dentro desses arquivos devem estar dados da precipitação diária em milímetros, separados por espaços e com casas decimais delimitadas por um ponto em vez de vírgula, provenientes diretamente da base de dados escolhida. 
+Para os dados de entrada, chamados de \emph{inputs}, o script precisa de 12 arquivos em formato .txt que funcionam como matrizes, cada um representando cada mês, de janeiro a dezembro. Esses arquivos devem ter 31 linhas, representando os dias, e no mínimo 2 colunas, representando a base histórica dos anos. Além desses 12 arquivos, um arquivo extra é necessário com a precipitação diária do dia anterior ao dia mais antigo da base de dados, pois a Cadeia de Markov a qual o modelo se baseia utiliza dados dos dias anteriores para gerar as probabilidades condicionais necessárias. Dentro desses arquivos devem estar dados da precipitação diária em milímetros, separados por espaços e com casas decimais delimitadas por um ponto em vez de vírgula, provenientes diretamente da base de dados escolhida. 
 
-O quadro \ref{q.input} demonstra um exemplo de um arquivo .txt que pode ser utilizado como \emph{input}. Percebe-se que o quadro tem 31 linhas, que representam os dias, e 3 colunas, que representam uma base histórica de três anos para um determinado mês. Assim, se a coluna 2 representar o ano de 2019, a terceira linha será o dia 3 de janeiro, portanto o script tem a informação de que a precipitação diária do dia 3 de janeiro de 2019 foi 1,4mm.
+O quadro \ref{q.input} demonstra um exemplo de um arquivo .txt que pode ser utilizado como \emph{input}. Percebe-se que o quadro tem 31 linhas, que representam os dias, e 3 colunas, que representam uma base histórica de três anos para o mês de janeiro. Assim, se a coluna 2 representar o ano de 2019, a terceira linha será o dia 3 de janeiro, portanto o script tem a informação de que a precipitação diária do dia 3 de janeiro de 2019 foi 1,4mm.
 
 Para dados reais, quanto maior o número de colunas, melhor será a simulação pluviométrica. Isso acontece porque as colunas representam os anos, e a Cadeia de Markov tem um grau de precisão maior conforme o número de dados históricos é aumentado.
 
 \begin{table}[H]
-\caption{Exemplo de \emph{input} utilizado pelo script para o processamento da simulação.}
+\caption{Exemplo de \emph{input} que pode ser utilizado pelo script para o processamento da simulação.}
 \label{q.input}
 \centering
 
@@ -80,10 +77,10 @@ Para dados reais, quanto maior o número de colunas, melhor será a simulação 
 \label{ss.outputs}
 Depois de processados os dados de entrada, o script gera automaticamente, em milésimos de segundos, o resultado bruto da simulação com base no modelo estudado.
 
-São dois os resultados gerados, também em formato .txt representando matrizes. O primeiro deles é uma matriz com 31 linhas e 12 colunas, ou seja, um ano inteiro simulado, com probabilidades de chuva entre 0 e 1 separadas por um espaço simples, conforme demonstrado no quadro \ref{q.output1}. O segundo output, e o mais importante, também é uma matriz com 31 linhas e 12 colunas, mas com dados binários (0 ou 1) representando se os dias vão ser secos ou chuvosos, respectivamente. O quadro \ref{q.output2} demonstra um exemplo do segundo resultado gerado pelo script.
+São dois os resultados gerados, também em formato .txt representando matrizes. O primeiro deles é uma matriz com 31 linhas e 12 colunas, ou seja, um ano inteiro simulado, com probabilidades de chuva entre 0 e 1 separadas por um espaço simples, conforme demonstrado no quadro \ref{q.output1}. O segundo output, e o mais importante, também é uma matriz com 31 linhas e 12 colunas, mas com dados binários, 0 ou 1, representando se os dias vão ser secos ou chuvosos, respectivamente. O quadro \ref{q.output2} demonstra um exemplo do segundo resultado gerado pelo script.
 
 \begin{table}[H]
-\caption{Exemplo de output com probabilidades condicionais gerado pelo script.}
+\caption{Exemplo de \emph{output} com probabilidades condicionais gerado pelo script.}
 \label{q.output1}
 \centering
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
@@ -170,7 +167,7 @@ São dois os resultados gerados, também em formato .txt representando matrizes.
 
 \section{Script}
 \label{s.io}
-O script foi programado no ambiente de desenvolvimento do Matlab, então tem o formato .m padrão da linguagem. São 251 linhas de código comentadas e elaboradas de maneira eficiente para que o tempo de processamento seja o mais rápido possível.
+O script foi programado no ambiente de desenvolvimento do MATLAB, então tem o formato .m padrão da linguagem. São 251 linhas de código comentadas e elaboradas de maneira eficiente para que o tempo de processamento seja o mais rápido possível.
 
 O autor deixou disponível de maneira integral e aberta o script, bem como a base de dados e os resultados brutos da simulação em sua página do GitHub \cite{script-tcc} para que quaisquer interessados possam consultar ou até mesmo utilizar para algum projeto pessoal. Na figura \ref{f.example-script} é possível observar parte de uma função do script.
 
@@ -179,7 +176,7 @@ O autor deixou disponível de maneira integral e aberta o script, bem como a bas
 	\centering
 	\includegraphics[width=\textwidth]{figs/example-script.png}
 	\label{f.example-script}
-	\legend{\small Fonte: Elaborado pelo Autor.}
+	\legend{\small Fonte: Elaborado pelo autor.}
 \end{figure}
 
 
