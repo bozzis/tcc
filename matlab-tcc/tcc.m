@@ -55,9 +55,9 @@ function tcc ()
         return
     end
 
-    function S () %Função S, utilizada quando o dia anterior for seco.
-        cima = 0; %Parte de cima da fração.
-        baixo = 0; %Parte de baixo da fração.
+    function S () %FunÃ§Ã£o S, utilizada quando o dia anterior for seco.
+        cima = 0; %Parte de cima da fraÃ§Ã£o.
+        baixo = 0; %Parte de baixo da fraÃ§Ã£o.
         diafunc=dia; %trocando a variavel dia para uma diafunc a ser usada nessa funcao
         if diafunc == 1 %tratamento especial se o dia do mes for 1, pois o script compara os dias anteriores, e nesse caso temos que pegar o dia anterior na matriz de outro mes
             for c = size(mes,2):-1:1 %planilha "mes" inicializada usando a funcao que da load nos meses
@@ -103,9 +103,9 @@ function tcc ()
     % chuvoso em vez de seco, e se o dia atual eh chuvoso.
     
     
-    function C () %Função C, utilizada quando o dia anterior for chuvoso. Mesma logica da funcao S.
-        cima = 0; %Parte de cima da fração.
-        baixo = 0; %Parte de baixo da fração.
+    function C () %FunÃ§Ã£o C, utilizada quando o dia anterior for chuvoso. Mesma logica da funcao S.
+        cima = 0; %Parte de cima da fraÃ§Ã£o.
+        baixo = 0; %Parte de baixo da fraÃ§Ã£o.
         diafunc=dia;
         if diafunc == 1
             for c = size(mes,2):-1:1
@@ -182,66 +182,52 @@ function tcc ()
                     C();
                     resultadosP(dia,atual) = cima/baixo;
                 end
-                continue %continua para o proximo loop do for
-            end
-            
-            if dia == 1 && atual > 1 %para os demais dias 1 dos outros meses, temos outro caso especifico
-                mesAntigo = defineMes(atual-1); %definimos "mesAntigo" para pegar o tamanho dele
-                aleatorio = random(0,1,1); %com base no modelo, geramos um aleatorio entre 0 e 1 para comparar com a probabilidade e definir se o dia foi seco ou chuvoso
-                
-                if resultadosP(size(mesAntigo,1),atual-1) < aleatorio %analisando o resultadosP (matriz com as probabilidades de chuva simuladas) para definir o resultadosB (matriz se o dia foi chuvoso ou seco)
-                    resultadosBin(size(mesAntigo,1),atual-1) = 0; % esse calculo tem como base o modelo, onde se a probabilidade < numero aleatorio gerado, o dia = seco
-                else
-                    resultadosBin(size(mesAntigo,1),atual-1) = 1; % caso contrario, chuvoso
-                end
-                
-                if resultadosBin(size(mesAntigo,1),atual-1) == 0 % se o dia anterior foi seco
-                    S(); %usamos a funcao S
-                    resultadosP(dia,atual) = cima/baixo;  % quando a funcao S termina e nos entrega os valor cima/baixo calculados, fazemos a divisao e salvamos na matriz resultadosP
-                else % se o dia anterior foi chuvoso
-                    C(); % funcao para o dia anterior chuvoso
-                    resultadosP(dia,atual) = cima/baixo;  % salvamos os resultados na matriz resultadosP             
-                end    
-                continue %continua para o proximo loop
-            end
-
-            % para os dias >= 2 de qualquer mes
-            aleatorio = random(0,1,1); %gera o numero aleatorio entre 0 e 1
-            if resultadosP(dia-1,atual) < aleatorio %como o dia atual >=2, fica mais facil de fazer a comparacao, nao precisamos ver mes anterior
-                resultadosBin(dia-1,atual) = 0;
-            else
-                resultadosBin(dia-1,atual) = 1;
-            end
-
-            
-            
-            if resultadosBin(dia-1,atual) == 0 % se o dia anterior foi seco
-                S(); %usamos a funcao S
-                resultadosP(dia,atual) = cima/baixo;  %resultados sao salvos
-            else % caso contrario, funcao C
-                C();
-                resultadosP(dia,atual) = cima/baixo; %resultados sao salvos
-            end
-
-
-            
-            
-            
-            
-            if dia == 31 && atual == 12 % para o dia 31/12/2022, nao vai ter um proximo loop
                 aleatorio = random(0,1,1); % gera numero aleatorio
                 if resultadosP(dia,atual) < aleatorio %temos que calcular o resultadosBin agora, pois nao vai ter um proximo loop, usamos o resultadosP gerado no loop atual
                     resultadosBin(dia,atual) = 0; % se a probabilidade for menor que o aleatorio, dia considerado como seco
                 else
                     resultadosBin(dia,atual) = 1;% caso contrario, dia considerado como chuvoso
                 end
+                continue %continua para o proximo loop do for
+            end
+            
+            if dia == 1 && atual > 1 %para os demais dias 1 dos outros meses, temos outro caso especifico
+                mesAntigo = defineMes(atual-1); %definimos "mesAntigo" para pegar o tamanho dele               
+                if resultadosBin(size(mesAntigo,1),atual-1) == 0 % se o dia anterior foi seco
+                    S(); %usamos a funcao S
+                    resultadosP(dia,atual) = cima/baixo;  % quando a funcao S termina e nos entrega os valor cima/baixo calculados, fazemos a divisao e salvamos na matriz resultadosP
+                else % se o dia anterior foi chuvoso
+                    C(); % funcao para o dia anterior chuvoso
+                    resultadosP(dia,atual) = cima/baixo;  % salvamos os resultados na matriz resultadosP             
+                end
+                aleatorio = random(0,1,1); % gera numero aleatorio
+                if resultadosP(dia,atual) < aleatorio %temos que calcular o resultadosBin agora, pois nao vai ter um proximo loop, usamos o resultadosP gerado no loop atual
+                    resultadosBin(dia,atual) = 0; % se a probabilidade for menor que o aleatorio, dia considerado como seco
+                else
+                    resultadosBin(dia,atual) = 1;% caso contrario, dia considerado como chuvoso
+                end
+                continue %continua para o proximo loop
+            end
+
+            if resultadosBin(dia-1,atual) == 0 % se o dia anterior foi seco
+                S(); %usamos a funcao S
+                resultadosP(dia,atual) = cima/baixo;  %resultados sao salvos
+            else % caso contrario, funcao C
+                C();
+                resultadosP(dia,atual) = cima/baixo; %resultados sao salvos
+            end      
+            aleatorio = random(0,1,1); % gera numero aleatorio
+            if resultadosP(dia,atual) < aleatorio %temos que calcular o resultadosBin agora, pois nao vai ter um proximo loop, usamos o resultadosP gerado no loop atual
+                resultadosBin(dia,atual) = 0; % se a probabilidade for menor que o aleatorio, dia considerado como seco
+            else
+                resultadosBin(dia,atual) = 1;% caso contrario, dia considerado como chuvoso
             end
         end
         atual = atual + 1; %incrementamos o mes atual, vai sair do while se atual > 12
     end
     
-    dlmwrite('resultadosP.txt',resultadosP); %salvamos resultadosP e Bin
-    dlmwrite('resultadosBin.txt',resultadosBin);
+    writematrix(resultadosP,'resultadosP.txt'); %salvamos resultadosP e Bin
+    writematrix(resultadosBin,'resultadosBin.txt');
 end
 
 
